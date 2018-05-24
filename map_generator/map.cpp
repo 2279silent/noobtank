@@ -37,13 +37,26 @@ bool MapLayer::init(std::vector<std::vector<Configure::MAP_OBJECT>>&& mapinfo)
 			base->setPosition(pos);
 			pos.x += Configure::g_baseWidth;
 
-			//mapping fence
-			Fence* fence = Fence::create("fence");
-			fence->setTag(static_cast<int32_t>(Configure::MAP_OBJECT::FENCE));
-			fence->setPosition(Configure::g_baseWidth / 2, Configure::g_baseHeight / 2);
-			fence->setRotation(random(0.0f, 359.0f));
+			if (col == Configure::MAP_OBJECT::FENCE)
+			{
+				//mapping fence
+				Fence* fence = Fence::create("fence");
+				fence->setTag(static_cast<int32_t>(Configure::MAP_OBJECT::FENCE));
+				fence->setPosition(Configure::g_baseWidth / 2, Configure::g_baseHeight / 2);
+				fence->setRotation(random(0.0f, 359.0f));
+				base->addChild(fence);
+			}
+			else if (col == Configure::MAP_OBJECT::HAY)
+			{
+				//mapping hay
+				Fence* hay = Fence::create("hay");
+				hay->setTag(static_cast<int32_t>(Configure::MAP_OBJECT::HAY));
+				hay->setPosition(Configure::g_baseWidth / 2, Configure::g_baseHeight / 2);
+				hay->setRotation(random(0.0f, 359.0f));
+				base->addChild(hay);
+			}
 
-			base->addChild(fence);
+			
 			this->addChild(base);
 		}
 		pos.x = 0.0f;

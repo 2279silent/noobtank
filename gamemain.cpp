@@ -30,24 +30,23 @@ bool GameMain::init(void)
 		return false;
 	}
 
-
-
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("image/image_all.plist");
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	std::vector<std::vector<Configure::MAP_OBJECT>> map;
 
-	map.resize(visibleSize.height / Configure::g_baseHeight);
+	std::vector<std::vector<Configure::MAP_OBJECT>>&& map = _mapGenerator.CreateMap();
 
-	for (auto& row : map)
-	{
-		row.resize(visibleSize.width / Configure::g_baseWidth);
-		for (auto& col : row)
-		{
-			col = Configure::MAP_OBJECT::HAY;
-		}
-	}
+	//map.resize(visibleSize.height / Configure::g_baseHeight);
+
+	//for (auto& row : map)
+	//{
+	//	row.resize(visibleSize.width / Configure::g_baseWidth);
+	//	for (auto& col : row)
+	//	{
+	//		col = static_cast<Configure::MAP_OBJECT>(random(0, 2));
+	//	}
+	//}
 
 	MapLayer* layer = MapLayer::create(std::move(map));
 
