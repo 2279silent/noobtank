@@ -35,33 +35,33 @@ bool MapLayer::init(std::vector<std::vector<Configure::MAP_OBJECT>>&& mapinfo)
 			//mapping base
 			Ground* base = Ground::create("ground_sand_000");
 			base->setPosition(pos);
-			pos.x += Configure::g_baseWidth;
+			pos.x += base->getContentSize().width;
 
 			if (col == Configure::MAP_OBJECT::FENCE)
 			{
 				//mapping fence
 				Fence* fence = Fence::create("fence");
-				fence->setTag(static_cast<int32_t>(Configure::MAP_OBJECT::FENCE));
+				fence->setTag(static_cast<uint8_t>(Configure::MAP_OBJECT::FENCE));
 				fence->setPosition(Configure::g_baseWidth / 2, Configure::g_baseHeight / 2);
-				fence->setRotation(random(0.0f, 359.0f));
+				//fence->setRotation(random(0.0f, 359.0f));
 				base->addChild(fence);
 			}
 			else if (col == Configure::MAP_OBJECT::HAY)
 			{
 				//mapping hay
-				Fence* hay = Fence::create("hay");
-				hay->setTag(static_cast<int32_t>(Configure::MAP_OBJECT::HAY));
+				Hay* hay = Hay::create("hay");
+				hay->setTag(static_cast<uint8_t>(Configure::MAP_OBJECT::HAY));
 				hay->setPosition(Configure::g_baseWidth / 2, Configure::g_baseHeight / 2);
 				hay->setRotation(random(0.0f, 359.0f));
 				base->addChild(hay);
-			}
-
-			
+			}			
 			this->addChild(base);
 		}
 		pos.x = 0.0f;
 		pos.y += Configure::g_baseHeight;
 	}
+
+	return true;
 }
 
 MapLayer::MapLayer(void)

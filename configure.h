@@ -44,9 +44,23 @@ namespace Configure
 		{
 			switch (color)	
 			{
-			case Configure::TANKCOLOR::RED:		return "tank_red";		break;
-			case Configure::TANKCOLOR::GREEN:	return "tank_green";	break;
-			case Configure::TANKCOLOR::BLUE:	return "tank_blue";		break;
+			case Configure::TANKCOLOR::RED:		return "tank_red_body";		break;
+			case Configure::TANKCOLOR::GREEN:	return "tank_green_body";	break;
+			case Configure::TANKCOLOR::BLUE:	return "tank_blue_body";		break;
+			default:							return "";				break;
+			}
+		}
+	};
+	class BulletInfo
+	{
+	public:
+		static std::string Name(TANKCOLOR color)
+		{
+			switch (color)
+			{
+			case Configure::TANKCOLOR::RED:		return "bullet_red";	break;
+			case Configure::TANKCOLOR::GREEN:	return "bullet_green";	break;
+			case Configure::TANKCOLOR::BLUE:	return "bullet_blue";	break;
 			default:							return "";				break;
 			}
 		}

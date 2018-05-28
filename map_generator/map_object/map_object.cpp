@@ -1,3 +1,4 @@
+#include "../../gamemain.h"
 #include "map_object.h"
 
 USING_NS_CC;
@@ -19,21 +20,23 @@ MapObjectImp* MapObjectImp::create(std::string spriteName)
 
 bool MapObjectImp::init(void)
 {
-	if (!Sprite::initWithSpriteFrameName(_spriteName))
+	if (_spriteName.empty())
+	{
+		if (!Sprite::init())
+		{
+			return false;
+		}		
+	}
+	else if (!Sprite::initWithSpriteFrameName(_spriteName))
 	{
 		return false;
 	}
 
-	_interactive = false;
 	_health = -1;
 	_damage = 0;
+	_interactive = false;
 
 	return true;
-}
-
-bool MapObjectImp::Interactive(void)
-{
-	return _interactive;
 }
 
 int32_t MapObjectImp::Damage(void)
@@ -41,9 +44,26 @@ int32_t MapObjectImp::Damage(void)
 	return _damage;
 }
 
+void MapObjectImp::Injure(int32_t value)
+{
+	if (_interactive)
+	{
+		_health -= value;
+		if (_health < 0)
+		{
+			_health = 0;
+		}
+	}
+}
+
 int32_t MapObjectImp::Health(void)
 {
 	return _health;
+}
+
+bool MapObjectImp::InterActive(void)
+{
+	return _interactive;
 }
 
 MapObjectImp::MapObjectImp(const std::string& spriteName)
@@ -78,9 +98,17 @@ bool Hay::init(void)
 	{
 		return false;
 	}
+	this->setTag(static_cast<uint8_t>(Configure::MAP_OBJECT::HAY));
 
-	_interactive = true;
+	PhysicsBody* body = PhysicsBody::createBox(this->getContentSize());
+	body->setDynamic(false);
+	body->setCategoryBitmask(0x01);
+	body->setCollisionBitmask(0x04);
+	body->setContactTestBitmask(0x04);
+	this->setPhysicsBody(body);
+
 	_health = static_cast<int32_t> (Configure::Health::BASIC);
+	_interactive = true;
 
 	return true;
 }
@@ -116,7 +144,14 @@ bool Fence::init(void)
 	{
 		return false;
 	}
+	this->setTag(static_cast<uint8_t>(Configure::MAP_OBJECT::FENCE));
 
+	PhysicsBody* body = PhysicsBody::createBox(this->getContentSize(), PhysicsMaterial(0.0f, 1.0f, 0.0f));
+	body->setDynamic(false);
+	body->setCategoryBitmask(0x02);
+	body->setCollisionBitmask(0x0c);
+	body->setContactTestBitmask(0x04);
+	this->setPhysicsBody(body);
 	return true;
 }
 
@@ -167,7 +202,7 @@ Ground::~Ground(void)
 
 Bullet* Bullet::create(Configure::TANKCOLOR color)
 {
-	Bullet* ref = new Bullet((color));
+	Bullet* ref = new Bullet();
 
 	if (ref && ref->init(color))
 	{
@@ -186,14 +221,48 @@ bool Bullet::init(Configure::TANKCOLOR color)
 	{
 		return false;
 	}
+	this->setSpriteFrame(Configure::BulletInfo::Name(color));
+	this->setTag(static_cast<uint8_t>(Configure::MAP_OBJECT::BULLET));
+
+	PhysicsBody* body = PhysicsBody::createBox(this->getContentSize());
+	body->setGravityEnable(false);
+	body->setCategoryBitmask(0x04);
+	body->setCollisionBitmask(0x03);
+	body->setContactTestBitmask(0x03);
+	this->setPhysicsBody(body);
+
 	_interactive = true;
-	_damage = Configure::TankInfo::Damage(color);
+	_damage = Configure::BulletInfo::Damage(color);
 
 	return true;
 }
 
-Bullet::Bullet(Configure::TANKCOLOR color)
-	:MapObjectImp(Configure::TankInfo::Name(color))
+void Bullet::SetDirection(cocos2d::Vec2 vector)
+{
+	if (vector.isZero() == false)
+	{
+		_vector = vector;
+		this->schedule(CC_SCHEDULE_SELECTOR(Bullet::OnFly, this));
+	}
+}
+
+void Bullet::OnFly(float dt)
+{
+	Vec2 position = this->getPosition() + _vector;
+	this->setPosition(position);
+
+	auto scene = Director::getInstance()->getRunningScene();
+	auto viewSize = scene->getContentSize();
+	auto tank = scene->getChildByTag(static_cast<uint32_t>(Configure::MAP_OBJECT::TANK));
+
+	Rect visibleRect(tank->getPosition()- Vec2(viewSize/2), viewSize);
+	if (visibleRect.containsPoint(position) == false)
+	{
+		this->removeFromParent();
+	}		
+}
+
+Bullet::Bullet(void)
 {
 	
 }

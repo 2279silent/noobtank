@@ -1,5 +1,6 @@
 #include "cocos2d.h"
 #include "map_generator.h"
+#include "map.h"
 
 USING_NS_CC;
 
@@ -84,8 +85,9 @@ MapGenerator::~MapGenerator()
 {
 }
 
-std::vector<std::vector<Configure::MAP_OBJECT>> MapGenerator::CreateMap(void)
+MapLayer* MapGenerator::CreateMap(void)
 {
+	_map.clear();
 	_map.resize(_mapHeight, std::vector<Configure::MAP_OBJECT>(1, Configure::MAP_OBJECT::GROUND));
 	for (auto& row : _map)
 	{
@@ -96,12 +98,14 @@ std::vector<std::vector<Configure::MAP_OBJECT>> MapGenerator::CreateMap(void)
 	std::vector<std::vector<Configure::MAP_OBJECT>> fenceMap;
 	switch (type)
 	{
-	case 0:	FillCurve();		break;
+	case 0:	FillLine();		break;
 	case 1:	FillCurve();	break;
 	default:		break;
 	}
+	FillHay();
+	MapLayer* layer = MapLayer::create(std::move(_map));
 
-	return _map;
+	return layer;
 }
 
 void MapGenerator::FillLine(void)
@@ -151,5 +155,21 @@ void MapGenerator::FillCurve(void)
 			startCol++;
 		}
 		fenceStartRow++;
+	}
+}
+
+void MapGenerator::FillHay(void)
+{
+	uint32_t amount = random(10, 15);
+
+	for (int i = 0; i < amount; i++)
+	{
+		uint32_t rowIndex = random(0, (int)_map.size()-1);
+		uint32_t colIndex = random(0, (int)_map.at(0).size()-1);
+
+		if (_map.at(rowIndex).at(colIndex) == Configure::MAP_OBJECT::GROUND)
+		{
+			_map.at(rowIndex).at(colIndex) = Configure::MAP_OBJECT::HAY;
+		}		
 	}
 }

@@ -3,6 +3,8 @@
 #include <vector>
 #include "../configure.h"
 
+class MapLayer;
+
 class FenceCombinationFactory
 {
 public:
@@ -23,11 +25,12 @@ public:
 	MapGenerator(void);
 	~MapGenerator(void);
 
-	std::vector<std::vector<Configure::MAP_OBJECT>> CreateMap(void);
+	MapLayer* CreateMap(void);
 
 protected:
 	void FillLine(void);
 	void FillCurve(void);
+	void FillHay(void);
 
 	FenceCombinationFactory _fenceCombinationFactory;
 	std::vector<std::vector<Configure::MAP_OBJECT>> _map;
